@@ -35,6 +35,7 @@ const crearUsuario = async(req, res = response) => {
             ok: true,
             uid: dbUser.id,
             name,
+            email: dbUser.email,
             token
         });
         
@@ -72,7 +73,7 @@ const loginUsuario = async(req, res = response) => {
         if(!validPassword){
             return res.status(400).json({
                 ok: false,
-                msg: 'El password no existe'
+                msg: 'El password no es valido'
             });
         }
 
@@ -84,7 +85,8 @@ const loginUsuario = async(req, res = response) => {
             ok: true,
             uid: dbUser.id,
             name: dbUser.name,
-            token            
+            email: dbUser.email,
+            token         
         })
 
 
@@ -102,15 +104,19 @@ const loginUsuario = async(req, res = response) => {
 
 const revalidarToken = async(req, res = response) => {
 
-    const {uid, name} = req;
+    const {uid} = req;
+
+    //Leer la BD
+    const dbUser = await Usuario.findById(uid);
 
     //Generar nuevo JWT
-    const token = await generarJWT(uid, name);
+    const token = await generarJWT(uid);
 
     return res.json({
         ok: true,
         uid,
-        name,
+        name: dbUser.name,
+        email: dbUser.email,
         token
     });
 };
